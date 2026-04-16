@@ -1,0 +1,67 @@
+version: "3"
+
+taskDcSvc: &taskDcSvc
+  vars:
+    SV: "{{default .DEFAULT_SERVICE .SV}}"
+    CMD: "{{default \"bash\" .CMD}}"
+  cmds:
+    - docker compose -f "{{.DC_FILE}}" {{.DOCKER_CMD}}
+
+tasks:
+  dev:up:
+    desc: "Start the dev stack"
+    vars:
+      DOCKER_CMD: "up -d"
+      SV: "{{.DEFAULT_SERVICE}}"
+    <<: *taskDcSvc
+
+  dev:down:
+    desc: "Stop containers (keep volumes)"
+    vars:
+      DOCKER_CMD: "down --remove-orphans"
+      SV: "{{.DEFAULT_SERVICE}}"
+    <<: *taskDcSvc
+
+  dev:nuke:
+    desc: "Remove containers AND volumes (destructive)"
+    vars:
+      DOCKER_CMD: "down -v --remove-orphans"
+      SV: "{{.DEFAULT_SERVICE}}"
+    <<: *taskDcSvc
+
+  dev:ps:
+    desc: "Show service status"
+    vars:
+      DOCKER_CMD: "ps"
+      SV: "{{.DEFAULT_SERVICE}}"
+    <<: *taskDcSvc
+
+  dev:logs:
+    desc: "Follow logs (SV={{.DEFAULT_SERVICE}} by default)"
+    vars:
+      DOCKER_CMD: "logs -f {{.SV}}"
+    <<: *taskDcSvc
+
+  dev:exec:
+    desc: "Shell into the service (SV={{.DEFAULT_SERVICE}}, CMD=bash by default)"
+    vars:
+      DOCKER_CMD: "exec {{.SV}} {{.CMD}}"
+    <<: *taskDcSvc
+
+  dev:restart:
+    desc: "Restart a service (SV={{.DEFAULT_SERVICE}})"
+    vars:
+      DOCKER_CMD: "restart {{.SV}}"
+    <<: *taskDcSvc
+
+  dev:build:
+    desc: "Build the service image (SV={{.DEFAULT_SERVICE}})"
+    vars:
+      DOCKER_CMD: "build {{.SV}}"
+    <<: *taskDcSvc
+
+  dev:shell:
+    desc: "Run an ephemeral container (SV={{.DEFAULT_SERVICE}})"
+    vars:
+      DOCKER_CMD: "run --rm {{.SV}} {{.CMD}}"
+    <<: *taskDcSvc

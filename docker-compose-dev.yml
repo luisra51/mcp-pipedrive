@@ -1,0 +1,10 @@
+services:
+  mcp-pipedrive-dev:
+    image: golang:1.25
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    tty: true
+    stdin_open: true
+    env_file:
+      - mcp-pipedrive-dev.env

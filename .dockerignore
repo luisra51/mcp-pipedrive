@@ -1,0 +1,16 @@
+.git
+.gitignore
+Dockerfile
+*.md
+*.png
+*.puml
+node_modules
+**/node_modules
+**/.DS_Store
+**/.idea
+**/.vscode
+**/dist
+**/bin
+**/.env
+**/*.env
+.cache/

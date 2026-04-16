@@ -1,0 +1,11 @@
+version: "3"
+
+includes:
+  dev:
+    taskfile: ./taskfiles/Docker.yml
+    flatten: true
+    vars:
+      DC_FILE: ./docker-compose-dev.yml
+      DEFAULT_SERVICE: mcp-pipedrive-dev
+
+tasks:
