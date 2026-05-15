@@ -59,6 +59,8 @@ func allTools() []mcppipedrive.Tool {
 		ActivitiesList, ActivitiesGet, ActivitiesCreate, ActivitiesUpdate, ActivitiesDelete,
 		// notes
 		NotesList, NotesCreate,
+		// mailbox
+		MailThreadsList, MailThreadsGet, MailMessagesGet, DealsMailList,
 		// cache (stats is always on; clear/invalidate behind AdminToolsEnabled)
 		CacheStats, CacheClear, CacheInvalidate,
 	}

@@ -35,9 +35,11 @@ const (
 	cacheProductTTLEnvVar  = "PIPEDRIVE_CACHE_PRODUCT_TTL"
 	cacheListTTLEnvVar     = "PIPEDRIVE_CACHE_LIST_TTL"
 	cacheSearchTTLEnvVar   = "PIPEDRIVE_CACHE_SEARCH_TTL"
-	cacheFollowerTTLEnvVar = "PIPEDRIVE_CACHE_FOLLOWER_TTL"
-	cacheStaleOn429EnvVar  = "PIPEDRIVE_CACHE_ALLOW_STALE_ON_429"
-	cacheStaleTTLEnvVar    = "PIPEDRIVE_CACHE_STALE_TTL"
+	cacheFollowerTTLEnvVar    = "PIPEDRIVE_CACHE_FOLLOWER_TTL"
+	cacheMailListTTLEnvVar    = "PIPEDRIVE_CACHE_MAIL_LIST_TTL"
+	cacheMailMessageTTLEnvVar = "PIPEDRIVE_CACHE_MAIL_MESSAGE_TTL"
+	cacheStaleOn429EnvVar     = "PIPEDRIVE_CACHE_ALLOW_STALE_ON_429"
+	cacheStaleTTLEnvVar       = "PIPEDRIVE_CACHE_STALE_TTL"
 
 	domainHeader     = "X-Pipedrive-Domain"
 	apiTokenHeader   = "X-Pipedrive-API-Token"
@@ -65,6 +67,13 @@ type CacheTTLs struct {
 	List         time.Duration
 	Search       time.Duration
 	Stale        time.Duration
+	// Mailbox endpoints. MailList is for /mailbox/mailThreads and
+	// /deals/{id}/mailMessages (short — listings drift). MailMessage is
+	// for /mailbox/mailMessages/{id} (long — message contents are
+	// immutable once delivered; mutable fields like read_flag can be
+	// busted via pipedrive.cache.invalidate).
+	MailList    time.Duration
+	MailMessage time.Duration
 }
 
 type Config struct {
@@ -200,5 +209,7 @@ func ttlsFromEnv() CacheTTLs {
 		List:         durationFromEnv(cacheListTTLEnvVar, 120*time.Second),
 		Search:       durationFromEnv(cacheSearchTTLEnvVar, 45*time.Second),
 		Stale:        durationFromEnv(cacheStaleTTLEnvVar, 24*time.Hour),
+		MailList:     durationFromEnv(cacheMailListTTLEnvVar, 60*time.Second),
+		MailMessage:  durationFromEnv(cacheMailMessageTTLEnvVar, 24*time.Hour),
 	}
 }
