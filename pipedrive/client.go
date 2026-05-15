@@ -19,12 +19,19 @@ type APIVersion string
 const (
 	V1 APIVersion = "v1"
 	V2 APIVersion = "v2"
+	// V1Legacy targets the bare /v1/ path (no /api/ segment). Some
+	// Pipedrive endpoints — notably /mailbox/* — are only published at
+	// /v1/, while everything else accepts the /api/v1/ form. Use this
+	// for those legacy paths.
+	V1Legacy APIVersion = "v1-legacy"
 )
 
 func (v APIVersion) prefix() string {
 	switch v {
 	case V2:
 		return "/api/v2"
+	case V1Legacy:
+		return "/v1"
 	default:
 		return "/api/v1"
 	}

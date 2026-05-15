@@ -53,6 +53,8 @@ Set `PIPEDRIVE_DOMAIN` to your Pipedrive subdomain, e.g. `mycompany.pipedrive.co
 | `PIPEDRIVE_CACHE_FOLLOWER_TTL` | `300s` | follower lists |
 | `PIPEDRIVE_CACHE_LIST_TTL` | `120s` | generic list responses |
 | `PIPEDRIVE_CACHE_SEARCH_TTL` | `45s` | search endpoints |
+| `PIPEDRIVE_CACHE_MAIL_LIST_TTL` | `60s` | `/mailbox/mailThreads` and `/deals/{id}/mailMessages` listings |
+| `PIPEDRIVE_CACHE_MAIL_MESSAGE_TTL` | `24h` | `/mailbox/mailMessages/{id}` — bodies are immutable; mutable fields like `read_flag` can lag, bust with `pipedrive.cache.invalidate` |
 | `PIPEDRIVE_CACHE_ALLOW_STALE_ON_429` | `true` | Serve expired cache if Pipedrive returns 429/5xx |
 | `PIPEDRIVE_CACHE_STALE_TTL` | `24h` | Max age for stale fallback |
 
@@ -64,7 +66,7 @@ Set `PIPEDRIVE_DOMAIN` to your Pipedrive subdomain, e.g. `mycompany.pipedrive.co
 | `X-Pipedrive-API-Token` | `PIPEDRIVE_API_TOKEN` |
 | `X-Pipedrive-OAuth-Token` | `PIPEDRIVE_OAUTH_ACCESS_TOKEN` |
 
-## Tools (54 total)
+## Tools (58 total)
 
 ### Read
 
@@ -80,6 +82,9 @@ Set `PIPEDRIVE_DOMAIN` to your Pipedrive subdomain, e.g. `mycompany.pipedrive.co
 - `pipedrive.deals.followers.list`
 - `pipedrive.persons.followers.list`
 - `pipedrive.organizations.followers.list`
+- `pipedrive.mail.threads.{list,get}` — token owner's connected mailbox (single-user scope). `list` supports `since`, `unread_only`, `fields=compact|full`.
+- `pipedrive.mail.messages.get` — one message with body. `body_format=text|html|none`. Cross-user scope.
+- `pipedrive.deals.mail.list` — all mail tied to a deal across the workspace (cross-user; aggregates teammates' mail). Body backfill is bounded-concurrency and reuses the cache.
 - `pipedrive.cache.stats`
 
 ### Write (gated by `PIPEDRIVE_ALLOW_WRITE=true`)
