@@ -3,8 +3,8 @@
 **Team oversight.** A sales manager monitors the pipeline, reassigns ownership, cleans up data, and runs end-of-period reviews. They need write/delete across sales entities but do not manage the product catalog or the cache.
 
 - **Tools exposed:** 47
-- **Tokens (tools/list):** 7,987
-- **Savings vs baseline:** 965 tokens (10.8 %)
+- **Tokens (tools/list):** 6,212
+- **Savings vs baseline:** 1,553 tokens (20.0 %)
 
 ## Pipedrive mapping
 

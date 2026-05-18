@@ -3,8 +3,8 @@
 **Campaign operator / nurturing.** Enriches contacts, runs lead generation, logs campaign touches. Reads organizations to attach leads to the right account, but does not create companies — that's sales ops territory.
 
 - **Tools exposed:** 22
-- **Tokens (tools/list):** 4,279
-- **Savings vs baseline:** 4,673 tokens (52.2 %)
+- **Tokens (tools/list):** 3,302
+- **Savings vs baseline:** 4,463 tokens (57.5 %)
 
 ## Pipedrive mapping
 

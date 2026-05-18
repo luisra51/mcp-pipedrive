@@ -4,17 +4,17 @@ This folder contains ready-to-paste configurations that expose only the subset o
 
 ## Why this matters
 
-Every time an LLM connects to this MCP it ingests the full tool schema. Listing all 54 tools costs ~8,950 tokens (cl100k_base). Scoping the surface to a single role can cut that by **30-60 %** without losing any real capability for that role.
+Every time an LLM connects to this MCP it ingests the full tool schema. Listing all 58 tools costs ~7,800 tokens (cl100k_base). Scoping the surface to a single role can cut that by **20-65 %** without losing any real capability for that role.
 
 | Role | Tools | Tokens | Saved | Doc |
 |---|---:|---:|---:|---|
-| [admin](roles/admin.md) | 54 | 8,952 | — | full surface |
-| [sales-manager](roles/sales-manager.md) | 47 | 7,987 | 10.8 % | team oversight |
-| [sales-rep](roles/sales-rep.md) | 33 | 6,049 | 32.4 % | account executive |
-| [sdr](roles/sdr.md) | 24 | 4,498 | 49.8 % | top-of-funnel / BDR |
-| [customer-success](roles/customer-success.md) | 19 | 3,623 | 59.5 % | post-sale account mgmt |
-| [read-only](roles/read-only.md) | 24 | 4,025 | 55.0 % | analyst / reporting |
-| [marketing](roles/marketing.md) | 22 | 4,279 | 52.2 % | campaigns / nurturing |
+| [admin](roles/admin.md) | 58 | 7,765 | — | full surface |
+| [sales-manager](roles/sales-manager.md) | 47 | 6,212 | 20.0 % | team oversight |
+| [sales-rep](roles/sales-rep.md) | 33 | 4,682 | 39.7 % | account executive |
+| [sdr](roles/sdr.md) | 24 | 3,473 | 55.3 % | top-of-funnel / BDR |
+| [customer-success](roles/customer-success.md) | 19 | 2,816 | 63.7 % | post-sale account mgmt |
+| [read-only](roles/read-only.md) | 28 | 3,995 | 48.6 % | analyst / reporting |
+| [marketing](roles/marketing.md) | 22 | 3,302 | 57.5 % | campaigns / nurturing |
 
 > Token counts measured with cl100k_base (OpenAI tokenizer). Claude's tokenizer is typically within ±10 % of that.
 

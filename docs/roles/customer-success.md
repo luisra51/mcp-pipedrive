@@ -3,8 +3,8 @@
 **Post-sale account management.** Reads won deals for context, updates contact/organization details, logs activities (renewals, QBRs, escalations) and notes. Does not create or modify deals — those are handled by AEs or sales ops.
 
 - **Tools exposed:** 19
-- **Tokens (tools/list):** 3,623
-- **Savings vs baseline:** 5,329 tokens (59.5 %)
+- **Tokens (tools/list):** 2,816
+- **Savings vs baseline:** 4,949 tokens (63.7 %)
 
 ## Pipedrive mapping
 

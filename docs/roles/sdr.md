@@ -3,8 +3,8 @@
 **Top-of-funnel / BDR.** Sales Development Reps qualify leads, enrich contact data, schedule first touches. They work upstream of deals — deal tools are deliberately excluded to keep the model focused on the lead-to-qualified-deal handoff.
 
 - **Tools exposed:** 24
-- **Tokens (tools/list):** 4,498
-- **Savings vs baseline:** 4,454 tokens (49.8 %)
+- **Tokens (tools/list):** 3,473
+- **Savings vs baseline:** 4,292 tokens (55.3 %)
 
 ## Pipedrive mapping
 

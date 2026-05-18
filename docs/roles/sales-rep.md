@@ -3,8 +3,8 @@
 **Account executive running their own book.** Creates and moves deals, manages contacts, attaches products, logs activities and notes. Deletes are off-limits — cleanup happens via the sales manager or admin.
 
 - **Tools exposed:** 33
-- **Tokens (tools/list):** 6,049
-- **Savings vs baseline:** 2,903 tokens (32.4 %)
+- **Tokens (tools/list):** 4,682
+- **Savings vs baseline:** 3,083 tokens (39.7 %)
 
 ## Pipedrive mapping
 
