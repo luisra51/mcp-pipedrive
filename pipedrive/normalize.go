@@ -108,6 +108,12 @@ func toBool(v any) bool {
 		return t
 	case string:
 		return t == "true" || t == "1"
+	case float64:
+		return t != 0
+	case int64:
+		return t != 0
+	case int:
+		return t != 0
 	}
 	return false
 }
@@ -324,7 +330,7 @@ type NormalizedFilter struct {
 	ID         int64  `json:"id"`
 	Name       string `json:"name"`
 	Type       string `json:"type,omitempty"`
-	Active     bool   `json:"active_flag"`
+	Active     bool   `json:"active"`
 	VisibleTo  string `json:"visible_to,omitempty"`
 	AddTime    string `json:"add_time,omitempty"`
 	UpdateTime string `json:"update_time,omitempty"`

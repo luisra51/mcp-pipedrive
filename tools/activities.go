@@ -293,7 +293,7 @@ func invalidateActivitiesCache(client *pipedrive.Client, id int64) {
 }
 
 var ActivitiesList = mcppipedrive.MustTool("pipedrive.activities.list",
-	"List activities (Pipedrive API v2) with cursor pagination and filter_id, link filters, due_date, and updated_since/updated_until.",
+	"List activities (Pipedrive API v2) with cursor pagination and filter_id, link filters, due_date, and updated_since/updated_until. When paginating a filtered call, re-pass filter_id with every cursor.",
 	activitiesList,
 	mcp.WithTitleAnnotation("List activities"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

@@ -93,6 +93,54 @@ func TestNormalizeActivityDone(t *testing.T) {
 	}
 }
 
+// Pipedrive sometimes returns boolean flags as JSON numbers (1/0). Those
+// decode to float64 in Go's untyped JSON path — toBool must treat them as
+// true/false, otherwise normalized .Active / .Done / .Primary fields would
+// be silently wrong on any endpoint that uses the numeric shape.
+func TestToBool_NumericForms(t *testing.T) {
+	cases := []struct {
+		name string
+		in   any
+		want bool
+	}{
+		{"float64 1", float64(1), true},
+		{"float64 0", float64(0), false},
+		{"int 1", 1, true},
+		{"int 0", 0, false},
+		{"int64 1", int64(1), true},
+		{"int64 0", int64(0), false},
+		{"bool true", true, true},
+		{"bool false", false, false},
+		{"string 1", "1", true},
+		{"string true", "true", true},
+		{"string 0", "0", false},
+		{"string empty", "", false},
+		{"nil", nil, false},
+	}
+	for _, c := range cases {
+		if got := toBool(c.in); got != c.want {
+			t.Errorf("toBool(%s=%v) = %v, want %v", c.name, c.in, got, c.want)
+		}
+	}
+}
+
+// NormalizedFilter must report Active correctly whether Pipedrive sends
+// active_flag as a JSON bool or a JSON number.
+func TestNormalizeFilter_ActiveNumericShape(t *testing.T) {
+	bf := NormalizeFilter(map[string]any{"id": float64(1), "name": "X", "type": "deals", "active_flag": true})
+	if !bf.Active {
+		t.Errorf("bool true active_flag → Active=false")
+	}
+	nf := NormalizeFilter(map[string]any{"id": float64(2), "name": "Y", "type": "deals", "active_flag": float64(1)})
+	if !nf.Active {
+		t.Errorf("numeric 1 active_flag → Active=false")
+	}
+	zf := NormalizeFilter(map[string]any{"id": float64(3), "name": "Z", "type": "deals", "active_flag": float64(0)})
+	if zf.Active {
+		t.Errorf("numeric 0 active_flag → Active=true")
+	}
+}
+
 func TestNormalizeNote(t *testing.T) {
 	n := NormalizeNote(map[string]any{
 		"id":      float64(1),

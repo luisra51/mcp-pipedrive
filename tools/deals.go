@@ -457,7 +457,7 @@ func wrapAPIError(err error) error {
 
 var DealsList = mcppipedrive.MustTool(
 	"pipedrive.deals.list",
-	"List deals (Pipedrive API v2) with optional filter_id, status, owner/pipeline/stage, updated_since/updated_until, and cursor pagination.",
+	"List deals (Pipedrive API v2) with optional filter_id, status, owner/pipeline/stage, updated_since/updated_until, and cursor pagination. When paginating a filtered call, re-pass filter_id with every cursor.",
 	dealsList,
 	mcp.WithTitleAnnotation("List deals"),
 	mcp.WithIdempotentHintAnnotation(true),

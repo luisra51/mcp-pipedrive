@@ -53,6 +53,22 @@ func mustQuery(t *testing.T, transport *captureTransport) url.Values {
 	return transport.last.URL.Query()
 }
 
+// assertRequest pins the upstream method + path so a refactor that
+// accidentally retargets a list handler (e.g. /api/v2/deals → /api/v2/deal)
+// is caught instead of silently shipping.
+func assertRequest(t *testing.T, transport *captureTransport, wantMethod, wantPath string) {
+	t.Helper()
+	if transport.last == nil {
+		t.Fatal("handler did not issue an HTTP request")
+	}
+	if got := transport.last.Method; got != wantMethod {
+		t.Errorf("HTTP method = %q, want %q", got, wantMethod)
+	}
+	if got := transport.last.URL.Path; got != wantPath {
+		t.Errorf("URL path = %q, want %q", got, wantPath)
+	}
+}
+
 func assertHas(t *testing.T, q url.Values, key, want string) {
 	t.Helper()
 	if got := q.Get(key); got != want {
@@ -77,6 +93,7 @@ func TestDealsList_QueryPropagation(t *testing.T) {
 		t.Fatalf("dealsList: %v", err)
 	}
 	q := mustQuery(t, transport)
+	assertRequest(t, transport, "GET", "/api/v2/deals")
 	assertHas(t, q, "filter_id", "42")
 	assertHas(t, q, "updated_since", "2026-05-01T00:00:00Z")
 	assertHas(t, q, "updated_until", "2026-05-31T00:00:00Z")
@@ -101,6 +118,7 @@ func TestPersonsList_QueryPropagation(t *testing.T) {
 		t.Fatalf("personsList: %v", err)
 	}
 	q := mustQuery(t, transport)
+	assertRequest(t, transport, "GET", "/api/v2/persons")
 	assertHas(t, q, "filter_id", "7")
 	assertHas(t, q, "updated_since", "2026-01-01T00:00:00Z")
 	assertHas(t, q, "updated_until", "2026-12-31T00:00:00Z")
@@ -125,6 +143,7 @@ func TestOrganizationsList_QueryPropagation(t *testing.T) {
 		t.Fatalf("organizationsList: %v", err)
 	}
 	q := mustQuery(t, transport)
+	assertRequest(t, transport, "GET", "/api/v2/organizations")
 	assertHas(t, q, "filter_id", "99")
 	assertHas(t, q, "updated_since", "2026-03-01T00:00:00Z")
 	assertHas(t, q, "updated_until", "2026-04-01T00:00:00Z")
@@ -150,6 +169,7 @@ func TestActivitiesList_QueryPropagation(t *testing.T) {
 		t.Fatalf("activitiesList: %v", err)
 	}
 	q := mustQuery(t, transport)
+	assertRequest(t, transport, "GET", "/api/v2/activities")
 	assertHas(t, q, "filter_id", "11")
 	assertHas(t, q, "due_date", "2026-05-22")
 	assertHas(t, q, "updated_since", "2026-05-01T00:00:00Z")
@@ -176,6 +196,7 @@ func TestProductsList_QueryPropagation(t *testing.T) {
 		t.Fatalf("productsList: %v", err)
 	}
 	q := mustQuery(t, transport)
+	assertRequest(t, transport, "GET", "/api/v2/products")
 	assertHas(t, q, "filter_id", "3")
 	assertHas(t, q, "updated_since", "2026-02-01T00:00:00Z")
 	assertHas(t, q, "updated_until", "2026-03-01T00:00:00Z")
@@ -196,6 +217,7 @@ func TestLeadsList_QueryPropagation(t *testing.T) {
 		t.Fatalf("leadsList: %v", err)
 	}
 	q := mustQuery(t, transport)
+	assertRequest(t, transport, "GET", "/api/v1/leads")
 	assertHas(t, q, "filter_id", "55")
 
 	ctx, transport = newTestCtx(t)
@@ -215,6 +237,7 @@ func TestNotesList_QueryPropagation(t *testing.T) {
 		t.Fatalf("notesList: %v", err)
 	}
 	q := mustQuery(t, transport)
+	assertRequest(t, transport, "GET", "/api/v1/notes")
 	assertHas(t, q, "filter_id", "17")
 	assertHas(t, q, "start_date", "2026-05-01")
 	assertHas(t, q, "end_date", "2026-05-31")
@@ -234,6 +257,7 @@ func TestFiltersList_TypePassthrough(t *testing.T) {
 	if _, err := filtersList(ctx, FiltersListParams{Type: "deals"}); err != nil {
 		t.Fatalf("filtersList: %v", err)
 	}
+	assertRequest(t, transport, "GET", "/api/v1/filters")
 	assertHas(t, mustQuery(t, transport), "type", "deals")
 
 	ctx, transport = newTestCtx(t)

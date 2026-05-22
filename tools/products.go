@@ -322,7 +322,7 @@ func invalidateProductsCache(client *pipedrive.Client, id int64) {
 }
 
 var ProductsList = mcppipedrive.MustTool("pipedrive.products.list",
-	"List products (Pipedrive API v2) with cursor pagination and filter_id / owner / active / updated_since-until filters.",
+	"List products (Pipedrive API v2) with cursor pagination and filter_id / owner / active / updated_since-until filters. When paginating a filtered call, re-pass filter_id with every cursor.",
 	productsList,
 	mcp.WithTitleAnnotation("List products"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

@@ -322,7 +322,7 @@ func invalidatePersonsCache(client *pipedrive.Client, id int64) {
 }
 
 var PersonsList = mcppipedrive.MustTool("pipedrive.persons.list",
-	"List persons (Pipedrive API v2) with cursor pagination and filter_id / owner / org / updated_since-until filters.",
+	"List persons (Pipedrive API v2) with cursor pagination and filter_id / owner / org / updated_since-until filters. When paginating a filtered call, re-pass filter_id with every cursor.",
 	personsList,
 	mcp.WithTitleAnnotation("List persons"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 
