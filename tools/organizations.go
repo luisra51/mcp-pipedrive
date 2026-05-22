@@ -15,11 +15,14 @@ import (
 )
 
 type OrganizationsListParams struct {
-	Limit      int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
-	Cursor     string `json:"cursor,omitempty" jsonschema:"description=Cursor from a previous page"`
-	OwnerID    int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by owner user ID"`
-	IncludeRaw bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
-	CacheMode  string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
+	Limit        int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
+	Cursor       string `json:"cursor,omitempty" jsonschema:"description=Cursor from a previous page"`
+	OwnerID      int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by owner user ID"`
+	FilterID     int64  `json:"filter_id,omitempty" jsonschema:"description=Apply a saved Pipedrive filter (discover via pipedrive.filters.list)"`
+	UpdatedSince string `json:"updated_since,omitempty" jsonschema:"description=RFC3339 lower bound on update_time"`
+	UpdatedUntil string `json:"updated_until,omitempty" jsonschema:"description=RFC3339 upper bound on update_time"`
+	IncludeRaw   bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
+	CacheMode    string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
 }
 
 type OrganizationsGetParams struct {
@@ -75,6 +78,15 @@ func organizationsList(ctx context.Context, args OrganizationsListParams) (any, 
 	}
 	if args.OwnerID != 0 {
 		q.Set("owner_id", strconv.FormatInt(args.OwnerID, 10))
+	}
+	if args.FilterID != 0 {
+		q.Set("filter_id", strconv.FormatInt(args.FilterID, 10))
+	}
+	if args.UpdatedSince != "" {
+		q.Set("updated_since", args.UpdatedSince)
+	}
+	if args.UpdatedUntil != "" {
+		q.Set("updated_until", args.UpdatedUntil)
 	}
 	req, err := client.NewRequest(pipedrive.V2, http.MethodGet, "/organizations", q, nil)
 	if err != nil {
@@ -286,7 +298,7 @@ func invalidateOrganizationsCache(client *pipedrive.Client, id int64) {
 }
 
 var OrganizationsList = mcppipedrive.MustTool("pipedrive.organizations.list",
-	"List organizations (Pipedrive API v2) with cursor pagination and owner filter.",
+	"List organizations (Pipedrive API v2) with cursor pagination and filter_id / owner / updated_since-until filter.",
 	organizationsList,
 	mcp.WithTitleAnnotation("List organizations"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

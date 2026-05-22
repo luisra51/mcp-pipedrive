@@ -15,12 +15,15 @@ import (
 )
 
 type ProductsListParams struct {
-	Limit      int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
-	Cursor     string `json:"cursor,omitempty" jsonschema:"description=Cursor from a previous page"`
-	OwnerID    int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by owner user ID"`
-	Active     *bool  `json:"active,omitempty" jsonschema:"description=Filter by active flag"`
-	IncludeRaw bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
-	CacheMode  string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
+	Limit        int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
+	Cursor       string `json:"cursor,omitempty" jsonschema:"description=Cursor from a previous page"`
+	OwnerID      int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by owner user ID"`
+	Active       *bool  `json:"active,omitempty" jsonschema:"description=Filter by active flag"`
+	FilterID     int64  `json:"filter_id,omitempty" jsonschema:"description=Apply a saved Pipedrive filter (discover via pipedrive.filters.list)"`
+	UpdatedSince string `json:"updated_since,omitempty" jsonschema:"description=RFC3339 lower bound on update_time"`
+	UpdatedUntil string `json:"updated_until,omitempty" jsonschema:"description=RFC3339 upper bound on update_time"`
+	IncludeRaw   bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
+	CacheMode    string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
 }
 
 type ProductsGetParams struct {
@@ -85,6 +88,15 @@ func productsList(ctx context.Context, args ProductsListParams) (any, error) {
 	}
 	if args.Active != nil {
 		q.Set("active", strconv.FormatBool(*args.Active))
+	}
+	if args.FilterID != 0 {
+		q.Set("filter_id", strconv.FormatInt(args.FilterID, 10))
+	}
+	if args.UpdatedSince != "" {
+		q.Set("updated_since", args.UpdatedSince)
+	}
+	if args.UpdatedUntil != "" {
+		q.Set("updated_until", args.UpdatedUntil)
 	}
 	req, err := client.NewRequest(pipedrive.V2, http.MethodGet, "/products", q, nil)
 	if err != nil {
@@ -310,7 +322,7 @@ func invalidateProductsCache(client *pipedrive.Client, id int64) {
 }
 
 var ProductsList = mcppipedrive.MustTool("pipedrive.products.list",
-	"List products (Pipedrive API v2) with cursor pagination and owner/active filters.",
+	"List products (Pipedrive API v2) with cursor pagination and filter_id / owner / active / updated_since-until filters.",
 	productsList,
 	mcp.WithTitleAnnotation("List products"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

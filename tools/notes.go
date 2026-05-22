@@ -24,6 +24,9 @@ type NotesListParams struct {
 	PersonID       int64  `json:"person_id,omitempty" jsonschema:"description=Filter by person ID"`
 	OrganizationID int64  `json:"organization_id,omitempty" jsonschema:"description=Filter by organization ID"`
 	UserID         int64  `json:"user_id,omitempty" jsonschema:"description=Filter by user ID"`
+	FilterID       int64  `json:"filter_id,omitempty" jsonschema:"description=Apply a saved Pipedrive filter (discover via pipedrive.filters.list)"`
+	StartDate      string `json:"start_date,omitempty" jsonschema:"description=YYYY-MM-DD lower bound on add_time"`
+	EndDate        string `json:"end_date,omitempty" jsonschema:"description=YYYY-MM-DD upper bound on add_time"`
 	IncludeRaw     bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v1 payload"`
 	CacheMode      string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
 }
@@ -68,6 +71,15 @@ func notesList(ctx context.Context, args NotesListParams) (any, error) {
 	}
 	if args.UserID != 0 {
 		q.Set("user_id", strconv.FormatInt(args.UserID, 10))
+	}
+	if args.FilterID != 0 {
+		q.Set("filter_id", strconv.FormatInt(args.FilterID, 10))
+	}
+	if args.StartDate != "" {
+		q.Set("start_date", args.StartDate)
+	}
+	if args.EndDate != "" {
+		q.Set("end_date", args.EndDate)
 	}
 	req, err := client.NewRequest(pipedrive.V1, http.MethodGet, "/notes", q, nil)
 	if err != nil {
@@ -131,7 +143,7 @@ func notesCreate(ctx context.Context, args NotesCreateParams) (any, error) {
 }
 
 var NotesList = mcppipedrive.MustTool("pipedrive.notes.list",
-	"List notes (Pipedrive API v1) filtered by deal/person/organization/user.",
+	"List notes (Pipedrive API v1) filtered by filter_id / deal / person / organization / user / start_date-end_date.",
 	notesList,
 	mcp.WithTitleAnnotation("List notes"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

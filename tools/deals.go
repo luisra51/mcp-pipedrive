@@ -21,14 +21,17 @@ import (
 // ---------------------------------------------------------------------------
 
 type DealsListParams struct {
-	Limit      int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
-	Cursor     string `json:"cursor,omitempty" jsonschema:"description=Cursor from a previous page"`
-	Status     string `json:"status,omitempty" jsonschema:"description=Filter by status: open|won|lost|deleted|all_not_deleted"`
-	OwnerID    int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by deal owner user ID"`
-	PipelineID int64  `json:"pipeline_id,omitempty" jsonschema:"description=Filter by pipeline ID"`
-	StageID    int64  `json:"stage_id,omitempty" jsonschema:"description=Filter by stage ID"`
-	IncludeRaw bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
-	CacheMode  string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
+	Limit        int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
+	Cursor       string `json:"cursor,omitempty" jsonschema:"description=Cursor from a previous page"`
+	Status       string `json:"status,omitempty" jsonschema:"description=Filter by status: open|won|lost|deleted|all_not_deleted"`
+	OwnerID      int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by deal owner user ID"`
+	PipelineID   int64  `json:"pipeline_id,omitempty" jsonschema:"description=Filter by pipeline ID"`
+	StageID      int64  `json:"stage_id,omitempty" jsonschema:"description=Filter by stage ID"`
+	FilterID     int64  `json:"filter_id,omitempty" jsonschema:"description=Apply a saved Pipedrive filter (discover via pipedrive.filters.list)"`
+	UpdatedSince string `json:"updated_since,omitempty" jsonschema:"description=RFC3339 lower bound on update_time (e.g. 2026-05-01T00:00:00Z)"`
+	UpdatedUntil string `json:"updated_until,omitempty" jsonschema:"description=RFC3339 upper bound on update_time"`
+	IncludeRaw   bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
+	CacheMode    string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
 }
 
 type DealsGetParams struct {
@@ -111,6 +114,15 @@ func dealsList(ctx context.Context, args DealsListParams) (any, error) {
 	}
 	if args.StageID != 0 {
 		q.Set("stage_id", strconv.FormatInt(args.StageID, 10))
+	}
+	if args.FilterID != 0 {
+		q.Set("filter_id", strconv.FormatInt(args.FilterID, 10))
+	}
+	if args.UpdatedSince != "" {
+		q.Set("updated_since", args.UpdatedSince)
+	}
+	if args.UpdatedUntil != "" {
+		q.Set("updated_until", args.UpdatedUntil)
 	}
 
 	req, err := client.NewRequest(pipedrive.V2, http.MethodGet, "/deals", q, nil)
@@ -445,7 +457,7 @@ func wrapAPIError(err error) error {
 
 var DealsList = mcppipedrive.MustTool(
 	"pipedrive.deals.list",
-	"List deals (Pipedrive API v2) with optional status/owner/pipeline/stage filters and cursor pagination.",
+	"List deals (Pipedrive API v2) with optional filter_id, status, owner/pipeline/stage, updated_since/updated_until, and cursor pagination.",
 	dealsList,
 	mcp.WithTitleAnnotation("List deals"),
 	mcp.WithIdempotentHintAnnotation(true),
