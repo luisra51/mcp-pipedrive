@@ -108,6 +108,12 @@ func toBool(v any) bool {
 		return t
 	case string:
 		return t == "true" || t == "1"
+	case float64:
+		return t != 0
+	case int64:
+		return t != 0
+	case int:
+		return t != 0
 	}
 	return false
 }
@@ -312,6 +318,41 @@ func NormalizeNoteList(raw []any) []NormalizedNote {
 	for _, v := range raw {
 		if m, ok := v.(map[string]any); ok {
 			out = append(out, NormalizeNote(m))
+		}
+	}
+	return out
+}
+
+// NormalizedFilter is the slim shape for a Pipedrive saved filter. The full
+// `conditions` tree is intentionally dropped — the LLM only needs id+name+type
+// to apply a filter via filter_id. Pass include_raw to see conditions.
+type NormalizedFilter struct {
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	Type       string `json:"type,omitempty"`
+	Active     bool   `json:"active"`
+	VisibleTo  string `json:"visible_to,omitempty"`
+	AddTime    string `json:"add_time,omitempty"`
+	UpdateTime string `json:"update_time,omitempty"`
+}
+
+func NormalizeFilter(raw map[string]any) NormalizedFilter {
+	return NormalizedFilter{
+		ID:         toInt64(raw["id"]),
+		Name:       toString(raw["name"]),
+		Type:       toString(raw["type"]),
+		Active:     toBool(firstNonNil(raw, "active_flag", "active")),
+		VisibleTo:  toString(raw["visible_to"]),
+		AddTime:    toString(raw["add_time"]),
+		UpdateTime: toString(raw["update_time"]),
+	}
+}
+
+func NormalizeFilterList(raw []any) []NormalizedFilter {
+	out := make([]NormalizedFilter, 0, len(raw))
+	for _, v := range raw {
+		if m, ok := v.(map[string]any); ok {
+			out = append(out, NormalizeFilter(m))
 		}
 	}
 	return out

@@ -22,6 +22,10 @@ type ActivitiesListParams struct {
 	PersonID       int64  `json:"person_id,omitempty" jsonschema:"description=Filter by person ID"`
 	OrganizationID int64  `json:"organization_id,omitempty" jsonschema:"description=Filter by organization ID"`
 	Done           *bool  `json:"done,omitempty" jsonschema:"description=Filter by done=true|false"`
+	FilterID       int64  `json:"filter_id,omitempty" jsonschema:"description=Apply a saved Pipedrive filter (discover via pipedrive.filters.list)"`
+	DueDate        string `json:"due_date,omitempty" jsonschema:"description=Filter by due date YYYY-MM-DD"`
+	UpdatedSince   string `json:"updated_since,omitempty" jsonschema:"description=RFC3339 lower bound on update_time"`
+	UpdatedUntil   string `json:"updated_until,omitempty" jsonschema:"description=RFC3339 upper bound on update_time"`
 	IncludeRaw     bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
 	CacheMode      string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
 }
@@ -97,6 +101,18 @@ func activitiesList(ctx context.Context, args ActivitiesListParams) (any, error)
 	}
 	if args.Done != nil {
 		q.Set("done", strconv.FormatBool(*args.Done))
+	}
+	if args.FilterID != 0 {
+		q.Set("filter_id", strconv.FormatInt(args.FilterID, 10))
+	}
+	if args.DueDate != "" {
+		q.Set("due_date", args.DueDate)
+	}
+	if args.UpdatedSince != "" {
+		q.Set("updated_since", args.UpdatedSince)
+	}
+	if args.UpdatedUntil != "" {
+		q.Set("updated_until", args.UpdatedUntil)
 	}
 	req, err := client.NewRequest(pipedrive.V2, http.MethodGet, "/activities", q, nil)
 	if err != nil {
@@ -277,7 +293,7 @@ func invalidateActivitiesCache(client *pipedrive.Client, id int64) {
 }
 
 var ActivitiesList = mcppipedrive.MustTool("pipedrive.activities.list",
-	"List activities (Pipedrive API v2) with cursor pagination and link filters.",
+	"List activities (Pipedrive API v2) with cursor pagination and filter_id, link filters, due_date, and updated_since/updated_until. When paginating a filtered call, re-pass filter_id with every cursor.",
 	activitiesList,
 	mcp.WithTitleAnnotation("List activities"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

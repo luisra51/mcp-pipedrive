@@ -19,6 +19,9 @@ type PersonsListParams struct {
 	Cursor         string `json:"cursor,omitempty" jsonschema:"description=Cursor from a previous page"`
 	OwnerID        int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by owner user ID"`
 	OrganizationID int64  `json:"organization_id,omitempty" jsonschema:"description=Filter by organization ID"`
+	FilterID       int64  `json:"filter_id,omitempty" jsonschema:"description=Apply a saved Pipedrive filter (discover via pipedrive.filters.list)"`
+	UpdatedSince   string `json:"updated_since,omitempty" jsonschema:"description=RFC3339 lower bound on update_time"`
+	UpdatedUntil   string `json:"updated_until,omitempty" jsonschema:"description=RFC3339 upper bound on update_time"`
 	IncludeRaw     bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v2 payload"`
 	CacheMode      string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
 }
@@ -84,6 +87,15 @@ func personsList(ctx context.Context, args PersonsListParams) (any, error) {
 	}
 	if args.OrganizationID != 0 {
 		q.Set("org_id", strconv.FormatInt(args.OrganizationID, 10))
+	}
+	if args.FilterID != 0 {
+		q.Set("filter_id", strconv.FormatInt(args.FilterID, 10))
+	}
+	if args.UpdatedSince != "" {
+		q.Set("updated_since", args.UpdatedSince)
+	}
+	if args.UpdatedUntil != "" {
+		q.Set("updated_until", args.UpdatedUntil)
 	}
 	req, err := client.NewRequest(pipedrive.V2, http.MethodGet, "/persons", q, nil)
 	if err != nil {
@@ -310,7 +322,7 @@ func invalidatePersonsCache(client *pipedrive.Client, id int64) {
 }
 
 var PersonsList = mcppipedrive.MustTool("pipedrive.persons.list",
-	"List persons (Pipedrive API v2) with cursor pagination and owner/org filters.",
+	"List persons (Pipedrive API v2) with cursor pagination and filter_id / owner / org / updated_since-until filters. When paginating a filtered call, re-pass filter_id with every cursor.",
 	personsList,
 	mcp.WithTitleAnnotation("List persons"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

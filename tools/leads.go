@@ -18,12 +18,13 @@ import (
 )
 
 type LeadsListParams struct {
-	Limit        int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
-	Start        int    `json:"start,omitempty" jsonschema:"description=Offset for pagination (v1 uses start)"`
-	OwnerID      int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by owner user ID"`
-	Archived     *bool  `json:"archived,omitempty" jsonschema:"description=Filter archived status"`
-	IncludeRaw   bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v1 payload"`
-	CacheMode    string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
+	Limit      int    `json:"limit,omitempty" jsonschema:"description=Max results (1-500 default 50)"`
+	Start      int    `json:"start,omitempty" jsonschema:"description=Offset for pagination (v1 uses start)"`
+	OwnerID    int64  `json:"owner_id,omitempty" jsonschema:"description=Filter by owner user ID"`
+	Archived   *bool  `json:"archived,omitempty" jsonschema:"description=Filter archived status"`
+	FilterID   int64  `json:"filter_id,omitempty" jsonschema:"description=Apply a saved Pipedrive filter (discover via pipedrive.filters.list). For date-bounded views use a filter."`
+	IncludeRaw bool   `json:"include_raw,omitempty" jsonschema:"description=If true also include raw v1 payload"`
+	CacheMode  string `json:"cache_mode,omitempty" jsonschema:"description=Cache mode: default|bypass|refresh|only"`
 }
 
 type LeadsGetParams struct {
@@ -91,6 +92,9 @@ func leadsList(ctx context.Context, args LeadsListParams) (any, error) {
 	}
 	if args.Archived != nil {
 		q.Set("archived_status", archivedFilter(*args.Archived))
+	}
+	if args.FilterID != 0 {
+		q.Set("filter_id", strconv.FormatInt(args.FilterID, 10))
 	}
 	req, err := client.NewRequest(pipedrive.V1, http.MethodGet, "/leads", q, nil)
 	if err != nil {
@@ -326,7 +330,7 @@ func invalidateLeadsCache(client *pipedrive.Client, id string) {
 }
 
 var LeadsList = mcppipedrive.MustTool("pipedrive.leads.list",
-	"List leads (Pipedrive API v1, no v2 equivalent) with optional owner/archived filters.",
+	"List leads (Pipedrive API v1, no v2 equivalent) with optional filter_id / owner / archived filters. For date-bounded views use a saved filter via filter_id.",
 	leadsList,
 	mcp.WithTitleAnnotation("List leads"), mcp.WithIdempotentHintAnnotation(true), mcp.WithReadOnlyHintAnnotation(true))
 

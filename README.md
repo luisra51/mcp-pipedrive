@@ -44,7 +44,7 @@ Set `PIPEDRIVE_DOMAIN` to your Pipedrive subdomain, e.g. `mycompany.pipedrive.co
 |---|---|---|
 | `PIPEDRIVE_CACHE_ENABLED` | `true` | Disable to bypass the cache entirely |
 | `PIPEDRIVE_CACHE_PATH` | `.cache/pipedrive-mcp.bbolt` | bbolt file path |
-| `PIPEDRIVE_CACHE_METADATA_TTL` | `12h` | users/pipelines/stages/fields |
+| `PIPEDRIVE_CACHE_METADATA_TTL` | `12h` | users/pipelines/stages/fields, saved filters |
 | `PIPEDRIVE_CACHE_DEAL_TTL` | `180s` | single deal GET |
 | `PIPEDRIVE_CACHE_PERSON_TTL` | `600s` | single person GET |
 | `PIPEDRIVE_CACHE_ORGANIZATION_TTL` | `600s` | single organization GET |
@@ -66,11 +66,12 @@ Set `PIPEDRIVE_DOMAIN` to your Pipedrive subdomain, e.g. `mycompany.pipedrive.co
 | `X-Pipedrive-API-Token` | `PIPEDRIVE_API_TOKEN` |
 | `X-Pipedrive-OAuth-Token` | `PIPEDRIVE_OAUTH_ACCESS_TOKEN` |
 
-## Tools (58 total)
+## Tools (59 total)
 
 ### Read
 
 - `pipedrive.context.get` — users, pipelines, stages, deal-fields (cached)
+- `pipedrive.filters.list` — discover saved filters; pass the returned `id` as `filter_id` on any list tool to reproduce a Pipedrive UI view. See [docs/filters.md](docs/filters.md).
 - `pipedrive.deals.{list,get,search}`
 - `pipedrive.deals.products.list`
 - `pipedrive.persons.{list,get,search}`
